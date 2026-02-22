@@ -7,8 +7,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { surface: '#050505', glass: 'rgba(20, 20, 20, 0.6)', borderGlass: 'rgba(255, 255, 255, 0.08)', accent: '#ffffff' } } } }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { 
+                        surface: '#050505', 
+                        glass: 'rgba(20, 20, 20, 0.6)',
+                        borderGlass: 'rgba(255, 255, 255, 0.08)',
+                        accent: '#ffffff'
+                    }
+                }
+            }
+        }
     </script>
     <style>
         body { background-color: #000; color: #f5f5f7; overflow-x: hidden; scroll-behavior: smooth; }
@@ -28,75 +43,12 @@
         .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(30px); }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
         ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #444; }
-        .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; stroke: #facc15; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
-        .checkmark { width: 64px; height: 64px; border-radius: 50%; display: block; stroke-width: 2; stroke: #fff; stroke-miterlimit: 10; margin: 10% auto; box-shadow: inset 0px 0px 0px #facc15; animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both; }
-        .checkmark-check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
-        @keyframes stroke { 100% { stroke-dashoffset: 0; } } @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } } @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 30px #facc15; } }
     </style>
 </head>
 <body class="antialiased">
 
-    <div id="overlay" class="fixed inset-0 bg-black/90 z-[100] backdrop-blur-sm" onclick="closeCart()"></div>
+    <div id="overlay" class="fixed inset-0 bg-black/90 z-[100]" onclick="closeCart()"></div>
     <div id="toast-container" class="fixed top-24 left-1/2 -translate-x-1/2 z-[400] flex flex-col gap-3 w-max"></div>
-
-    <div id="modal-payment" class="fixed inset-0 z-[300] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-xl">
-        <div class="glass-panel p-8 md:p-12 w-full max-w-md rounded-[2.5rem] relative flex flex-col overflow-hidden">
-            <button onclick="closeModal('modal-payment')" class="absolute top-6 right-6 text-gray-500 hover:text-white transition z-20"><i class="fa-solid fa-xmark text-xl"></i></button>
-            
-            <div id="payment-form-step">
-                <p class="text-[9px] track-mega uppercase text-green-400 mb-2 flex items-center gap-2"><i class="fa-solid fa-shield-check"></i> 256-Bit Encrypted</p>
-                <h2 class="text-3xl font-light mb-8">Secure Payment</h2>
-                
-                <div class="flex gap-2 mb-8 bg-white/5 p-1 rounded-2xl border border-white/5">
-                    <button id="tab-upi-app" onclick="switchPayMethod('upi-app')" class="flex-1 py-3 bg-white text-black rounded-xl text-[10px] uppercase track-mega font-bold shadow-lg">UPI App</button>
-                    <button id="tab-upi-qr" onclick="switchPayMethod('upi-qr')" class="flex-1 py-3 text-gray-500 hover:text-white rounded-xl text-[10px] uppercase track-mega font-bold">Scan QR</button>
-                </div>
-
-                <div id="form-upi-app" class="flex flex-col items-center space-y-6 mb-10 fade-in-up">
-                    <p class="text-[10px] text-gray-400 uppercase track-mega text-center">Fastest way to pay</p>
-                    <button onclick="openUPIApp()" class="w-full bg-[#111] border border-white/20 hover:border-white text-white py-5 rounded-2xl flex items-center justify-center gap-4 transition-all group">
-                        <img src="https://cdn.iconscout.com/icon/free/png-256/free-upi-logo-icon-download-in-svg-png-gif-file-formats--unified-payment-interface-payment-money-transfer-logos-icons-1747946.png" class="h-6 filter grayscale group-hover:grayscale-0 transition-all">
-                        <span class="text-xs uppercase track-mega font-bold">Open GPay / PhonePe</span>
-                    </button>
-                    <div class="w-full border-t border-white/10 pt-6 mt-2 relative">
-                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#121212] px-3 text-[9px] text-gray-500 uppercase track-mega">Step 2</span>
-                        <input type="text" id="upi-app-utr" placeholder="Enter 12-Digit Ref. No after payment" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full text-sm text-center tracking-[0.2em] font-mono focus:border-yellow-400 transition-colors">
-                    </div>
-                </div>
-
-                <div id="form-upi-qr" class="hidden flex-col items-center space-y-6 mb-10 fade-in-up">
-                    <div class="bg-white p-3 rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.1)] relative">
-                        <img id="dynamic-qr" src="" alt="Dynamic UPI QR" class="w-36 h-36">
-                    </div>
-                    <div class="text-center w-full">
-                        <p class="text-[9px] text-gray-400 uppercase track-mega mb-1">Paying to:</p>
-                        <p id="display-merchant" class="text-sm font-bold text-white tracking-widest"></p>
-                    </div>
-                    <input type="text" id="upi-qr-utr" placeholder="Enter 12-Digit UTR Number" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full text-sm text-center tracking-[0.2em] font-mono focus:border-yellow-400 transition-colors">
-                </div>
-
-                <div class="flex justify-between items-center mb-8 border-t border-white/10 pt-6">
-                    <span class="text-[10px] text-gray-400 uppercase track-mega">Amount Payable</span>
-                    <span id="pay-amount-display" class="text-2xl font-light text-white">₹0</span>
-                </div>
-
-                <button onclick="verifyPayment()" id="pay-btn" class="w-full bg-white text-black py-5 rounded-full text-[10px] uppercase track-mega font-bold btn-sleek flex items-center justify-center gap-3">
-                    Submit for Verification <i class="fa-solid fa-arrow-right"></i>
-                </button>
-            </div>
-
-            <div id="payment-success-step" class="hidden flex-col items-center justify-center py-10 text-center">
-                <svg class="checkmark mb-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                </svg>
-                <h3 class="text-2xl font-light mb-2">Order Received</h3>
-                <p class="text-xs text-yellow-400 uppercase track-mega mb-2 font-bold">Pending Merchant Review</p>
-                <p class="text-[10px] text-gray-400 mb-8 max-w-xs">The store admin is currently verifying your UTR manually. Once verified, your order will be shipped.</p>
-                <button onclick="finishOrder()" class="border border-white/20 px-10 py-4 rounded-full text-[10px] uppercase track-mega hover:bg-white hover:text-black transition">Return to Store</button>
-            </div>
-        </div>
-    </div>
 
     <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full md:w-[450px] bg-[#050505] border-l border-white/5 z-[150] flex flex-col">
         <div class="p-8 border-b border-white/10 flex justify-between items-center">
@@ -122,18 +74,18 @@
     <div id="modal-settings" class="fixed inset-0 z-[250] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass-panel p-10 w-full max-w-md rounded-[2rem] relative">
             <button onclick="closeModal('modal-settings')" class="absolute top-6 right-6 text-gray-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="text-[10px] uppercase track-mega text-accent font-bold mb-8 text-center border-b border-white/10 pb-4"><i class="fa-solid fa-building-columns mr-2"></i> Payment Setup</h2>
+            <h2 class="text-[10px] uppercase track-mega text-accent font-bold mb-8 text-center border-b border-white/10 pb-4"><i class="fa-solid fa-building-columns mr-2"></i> Gateway Setup</h2>
             <form onsubmit="saveSettings(event)" class="space-y-6">
                 <div>
-                    <label class="text-[9px] uppercase track-mega text-gray-500 block mb-2">Your Store Name</label>
+                    <label class="text-[9px] uppercase track-mega text-gray-500 block mb-2">Store Name (Shown on Payment page)</label>
                     <input type="text" id="set-merchant" required class="w-full text-sm font-semibold text-white">
                 </div>
                 <div>
-                    <label class="text-[9px] uppercase track-mega text-gray-500 block mb-2">Your Real UPI ID (VPA)</label>
-                    <input type="text" id="set-upi" required class="w-full text-sm font-mono text-green-400 tracking-wider">
+                    <label class="text-[9px] uppercase track-mega text-gray-500 block mb-2">Razorpay Key ID</label>
+                    <input type="text" id="set-rzp" required class="w-full text-sm font-mono text-green-400 tracking-wider" placeholder="rzp_test_...">
                 </div>
                 <div class="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <p class="text-[9px] text-gray-400 uppercase track-mega leading-relaxed"><i class="fa-solid fa-circle-info text-blue-400 mr-1"></i> QR code will be generated from this exact UPI ID. Customers will pay directly to you.</p>
+                    <p class="text-[9px] text-gray-400 uppercase track-mega leading-relaxed"><i class="fa-solid fa-circle-info text-blue-400 mr-1"></i> Razorpay will handle all Cards, UPI, and Verification securely.</p>
                 </div>
                 <button type="submit" class="w-full border border-white text-white py-4 rounded-full text-[10px] uppercase track-mega font-bold mt-2 hover:bg-white hover:text-black transition">Save Configuration</button>
             </form>
@@ -182,7 +134,6 @@
             <div class="flex items-center gap-8">
                 <div class="hidden md:flex gap-8 text-[10px] uppercase track-mega font-medium text-gray-400">
                     <button onclick="navigate('home')" class="hover:text-white transition">Gallery</button>
-                    <button onclick="document.getElementById('store').scrollIntoView()" class="hover:text-white transition">Shop</button>
                 </div>
                 <div id="auth-section" class="text-[10px] uppercase track-mega flex items-center gap-6 text-gray-400 font-bold border-l border-white/10 pl-8"></div>
                 <button onclick="openCart()" class="relative hover:text-white transition flex items-center gap-2">
@@ -194,7 +145,6 @@
     </nav>
 
     <main class="min-h-screen flex flex-col pt-[80px]">
-        
         <section id="view-home" class="view-section flex-grow">
             <div id="ad-slider-container" class="relative w-full h-[75vh] flex items-center justify-center overflow-hidden bg-[#020202]">
                 <div class="absolute w-[600px] h-[600px] bg-white/5 blur-[120px] rounded-full pointer-events-none z-0"></div>
@@ -231,7 +181,7 @@
                     <h2 class="text-4xl font-hairline tracking-tight uppercase">Command Center</h2>
                 </div>
                 <div class="flex flex-wrap gap-4">
-                    <button onclick="openModal('modal-settings')" class="bg-[#111] border border-white/20 px-6 py-3 rounded-full text-[10px] font-bold uppercase track-mega hover:border-white transition"><i class="fa-solid fa-gear"></i> Payment Setup</button>
+                    <button onclick="openModal('modal-settings')" class="bg-[#111] border border-white/20 px-6 py-3 rounded-full text-[10px] font-bold uppercase track-mega hover:border-white transition"><i class="fa-solid fa-gear"></i> Razorpay Config</button>
                     <button onclick="openModal('modal-ad')" class="bg-[#111] border border-white/20 px-6 py-3 rounded-full text-[10px] font-bold uppercase track-mega hover:border-white transition">Banners</button>
                     <button onclick="openModal('modal-product')" class="bg-white text-black px-6 py-3 rounded-full text-[10px] font-bold uppercase track-mega hover:bg-gray-200 transition">Add Product</button>
                 </div>
@@ -260,10 +210,10 @@
                 <div class="xl:col-span-8 flex flex-col gap-10 fade-in-up" style="animation-delay: 0.2s;">
                     <div>
                         <h3 class="text-[10px] font-bold uppercase track-mega text-gray-400 mb-6 flex items-center gap-3">
-                            <span class="h-2 w-2 rounded-full bg-yellow-500 animate-pulse"></span> Action Required / Orders
+                            <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span> Paid & Verified Transactions
                         </h3>
                         <div id="admin-orders" class="space-y-4"></div>
-                        <div id="no-orders" class="glass-panel p-10 text-center rounded-3xl text-gray-600 text-[10px] uppercase track-mega">Inbox Empty...</div>
+                        <div id="no-orders" class="glass-panel p-10 text-center rounded-3xl text-gray-600 text-[10px] uppercase track-mega">Waiting for live Razorpay verified payments...</div>
                     </div>
 
                     <div>
@@ -281,16 +231,20 @@
     <footer class="border-t border-white/10 bg-[#020202]">
         <div class="max-w-[1400px] mx-auto px-6 md:px-12 py-16 flex flex-col md:flex-row justify-between items-center gap-8">
             <div class="text-xl font-hairline track-mega text-gray-500">ELECTR<span class="font-bold text-white">O</span></div>
-            <p class="text-[9px] uppercase track-mega text-gray-600">&copy; 2026 Electro Premium Tech.</p>
+            <div class="flex gap-8 text-[10px] uppercase track-mega text-gray-600">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Secured by Razorpay</span>
+            </div>
+            <p class="text-[9px] uppercase track-mega text-gray-600">&copy; 2026 Electro Inc. The Aesthetic Standard.</p>
         </div>
     </footer>
 
     <script>
         const inr = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
         
+        // APP STATE
         let state = {
             user: null, cart: [], orders: [], currentFilter: 'All',
-            settings: { upiId: 'electrostore@ybl', merchantName: 'Electro Premium Store' }, 
+            settings: { rzpKey: '', merchantName: 'Electro Premium Store' }, 
             categories: ['Audio', 'Vision', 'Lifestyle'],
             ads: [{ id: 'ad1', title: 'PURE <span class="font-semibold">VISION.</span>', subtitle: 'The aesthetic of future tech', img: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=2000' }],
             products: [
@@ -301,7 +255,7 @@
 
         function showToast(msg, type = 'info') {
             const c = document.getElementById('toast-container'); const t = document.createElement('div');
-            let color = type === 'error' ? 'text-red-400 border-red-500' : type === 'warning' ? 'text-yellow-400 border-yellow-500' : 'text-white border-white';
+            let color = type === 'error' ? 'text-red-400 border-red-500' : 'text-white border-white';
             t.className = `glass-panel px-6 py-4 rounded-full fade-in-up text-[10px] uppercase track-mega font-bold ${color} shadow-2xl border-l-2`;
             t.innerText = msg; c.appendChild(t);
             setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(10px)'; setTimeout(() => t.remove(), 400); }, 3000);
@@ -416,10 +370,10 @@
         }
 
         function addToCart(id) {
-            if (!state.user) { showToast('Please sign in first', 'warning'); navigate('login'); return; }
+            if (!state.user) { showToast('Please sign in first', 'error'); navigate('login'); return; }
             const p = state.products.find(x => x.id === id); if (p.stock <= 0) return;
             const exists = state.cart.find(x => x.id === id);
-            if (exists) { if(exists.qty < p.stock) exists.qty++; else return showToast('Limit reached', 'warning'); } else state.cart.push({...p, qty: 1});
+            if (exists) { if(exists.qty < p.stock) exists.qty++; else return showToast('Limit reached', 'error'); } else state.cart.push({...p, qty: 1});
             updateCartCount(); openCart();
         }
         function updateCartCount() { document.getElementById('nav-cart-count').innerText = state.cart.reduce((a,b) => a + b.qty, 0); }
@@ -446,73 +400,74 @@
         }
         function removeFromCart(id) { state.cart = state.cart.filter(x => x.id !== id); renderCart(); updateCartCount(); }
 
-        // REALISTIC ANTI-FRAUD PAYMENT LOGIC
+        // RAZORPAY INTEGRATION LOGIC
         function openCheckoutDetails() {
             const form = document.getElementById('checkout-details');
-            if(form.classList.contains('hidden')) { form.classList.remove('hidden'); document.getElementById('checkout-init-btn').innerText = 'Continue to Payment'; document.getElementById('checkout-init-btn').onclick = openPaymentModal; }
+            if(form.classList.contains('hidden')) { 
+                form.classList.remove('hidden'); 
+                document.getElementById('checkout-init-btn').innerText = 'Pay securely with Razorpay'; 
+                document.getElementById('checkout-init-btn').onclick = initiateRazorpayPayment; 
+            }
         }
 
-        let currentMethod = 'upi-app';
-        function switchPayMethod(method) {
-            currentMethod = method;
-            document.getElementById('tab-upi-app').className = method === 'upi-app' ? 'flex-1 py-3 bg-white text-black rounded-xl text-[10px] uppercase track-mega font-bold transition-all shadow-lg shadow-white/20' : 'flex-1 py-3 text-gray-500 hover:text-white rounded-xl text-[10px] uppercase track-mega font-bold transition-all';
-            document.getElementById('tab-upi-qr').className = method === 'upi-qr' ? 'flex-1 py-3 bg-white text-black rounded-xl text-[10px] uppercase track-mega font-bold transition-all shadow-lg shadow-white/20' : 'flex-1 py-3 text-gray-500 hover:text-white rounded-xl text-[10px] uppercase track-mega font-bold transition-all';
-            
-            document.getElementById('form-upi-app').classList.toggle('hidden', method !== 'upi-app'); document.getElementById('form-upi-app').classList.toggle('flex', method === 'upi-app');
-            document.getElementById('form-upi-qr').classList.toggle('hidden', method !== 'upi-qr'); document.getElementById('form-upi-qr').classList.toggle('flex', method === 'upi-qr');
+        function initiateRazorpayPayment() {
+            const name = document.getElementById('cust-name').value.trim(); 
+            const addr = document.getElementById('cust-address').value.trim(); 
+            const phone = document.getElementById('cust-phone').value.trim();
+            if(!name || !addr || !phone) return showToast('Please fill complete logistics details', 'error');
+
+            if(!state.settings.rzpKey || state.settings.rzpKey.trim() === '') {
+                return showToast('Admin must configure Razorpay Key in Settings first', 'error');
+            }
+
+            const totalPaise = state.cart.reduce((a,b) => a + (b.price * b.qty), 0) * 100; // Razorpay uses paise
+
+            var options = {
+                "key": state.settings.rzpKey, 
+                "amount": totalPaise, 
+                "currency": "INR",
+                "name": state.settings.merchantName,
+                "description": "Premium Order Checkout",
+                "theme": { "color": "#000000" },
+                "prefill": {
+                    "name": name,
+                    "contact": phone
+                },
+                "handler": function (response) {
+                    // Success Callback from Razorpay
+                    processVerifiedOrder(response.razorpay_payment_id, name, phone);
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function (response){
+                showToast('Payment Failed: ' + response.error.description, 'error');
+            });
+            rzp1.open();
         }
 
-        function openUPIApp() {
-            const totalAmt = state.cart.reduce((a,b) => a + (b.price * b.qty), 0);
-            const upiString = `upi://pay?pa=${state.settings.upiId}&pn=${encodeURIComponent(state.settings.merchantName)}&am=${totalAmt}&cu=INR`;
-            window.location.href = upiString; // OPENS GPAY/PHONEPE
-            showToast('Opening Payment App...', 'info');
+        function processVerifiedOrder(paymentId, name, phone) {
+            closeCart();
+            // Deduct stock safely
+            state.cart.forEach(c => { const p = state.products.find(x => x.id === c.id); if(p) p.stock -= c.qty; });
+            
+            // Add Verified Order
+            state.orders.unshift({
+                id: 'ORD-' + Math.floor(100000 + Math.random()*900000),
+                customer: name, 
+                phone: phone,
+                paymentId: paymentId, // Store Razorpay ID
+                items: [...state.cart], 
+                total: state.cart.reduce((a,b) => a + (b.price * b.qty), 0),
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            });
+            
+            state.cart = []; updateCartCount(); 
+            document.getElementById('cust-name').value = ''; document.getElementById('cust-address').value = ''; document.getElementById('cust-phone').value='';
+            
+            showToast('Order Paid & Verified Successfully', 'success');
+            renderHome();
+            if(state.user && state.user.role === 'admin') renderAdmin();
         }
-
-        function openPaymentModal() {
-            const name = document.getElementById('cust-name').value.trim(); const addr = document.getElementById('cust-address').value.trim(); const phone = document.getElementById('cust-phone').value.trim();
-            if(!name || !addr || !phone) return showToast('Complete logistics details required', 'error');
-            
-            closeCart(); switchPayMethod('upi-app');
-            document.getElementById('upi-app-utr').value = ''; document.getElementById('upi-qr-utr').value = '';
-            
-            const totalAmt = state.cart.reduce((a,b) => a + (b.price * b.qty), 0);
-            document.getElementById('pay-amount-display').innerText = inr(totalAmt);
-            
-            // DYNAMIC QR
-            const upiString = `upi://pay?pa=${state.settings.upiId}&pn=${encodeURIComponent(state.settings.merchantName)}&am=${totalAmt}&cu=INR`;
-            document.getElementById('dynamic-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}&color=000000&bgcolor=ffffff`;
-            document.getElementById('display-merchant').innerText = state.settings.merchantName;
-
-            document.getElementById('payment-form-step').classList.remove('hidden'); document.getElementById('payment-success-step').classList.add('hidden');
-            document.getElementById('pay-btn').innerHTML = '<i class="fa-solid fa-lock"></i> Submit for Verification';
-            document.getElementById('modal-payment').classList.remove('hidden'); document.getElementById('modal-payment').classList.add('flex');
-        }
-
-        function verifyPayment() {
-            let utr = currentMethod === 'upi-app' ? document.getElementById('upi-app-utr').value : document.getElementById('upi-qr-utr').value;
-            if (utr.length !== 12) return showToast('Strict Error: Enter valid 12-Digit Reference No.', 'error');
-
-            const btn = document.getElementById('pay-btn');
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Securing Details...';
-            
-            setTimeout(() => {
-                // DON'T deduct stock yet. Order goes to PENDING review.
-                state.orders.unshift({
-                    id: 'ORD-' + Math.floor(100000 + Math.random()*900000),
-                    customer: document.getElementById('cust-name').value, phone: document.getElementById('cust-phone').value,
-                    items: [...state.cart], total: state.cart.reduce((a,b) => a + (b.price * b.qty), 0),
-                    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                    status: 'Pending', // PENDING STATUS FOR ADMIN
-                    utr: utr
-                });
-                
-                document.getElementById('payment-form-step').classList.add('hidden'); document.getElementById('payment-success-step').classList.remove('hidden'); document.getElementById('payment-success-step').classList.add('flex');
-                
-                state.cart = []; updateCartCount(); document.getElementById('cust-name').value = ''; document.getElementById('cust-address').value = ''; document.getElementById('cust-phone').value='';
-            }, 1500); 
-        }
-        function finishOrder() { closeModal('modal-payment'); renderHome(); }
 
         // ADMIN FUNCTIONS
         function renderAdminCategories() {
@@ -529,34 +484,22 @@
             
             const ordersDiv = document.getElementById('admin-orders');
             document.getElementById('no-orders').classList.toggle('hidden', state.orders.length > 0);
-            ordersDiv.innerHTML = state.orders.map(o => {
-                let badge = o.status === 'Pending' ? `<span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full border border-yellow-500/50 text-[9px] uppercase track-mega font-bold">Pending Review</span>` : `<span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full border border-green-500/50 text-[9px] uppercase track-mega font-bold"><i class="fa-solid fa-check"></i> Verified</span>`;
-                let btn = o.status === 'Pending' ? `<button onclick="approveOrder('${o.id}')" class="bg-white text-black px-4 py-2 rounded-full text-[9px] uppercase track-mega font-bold hover:bg-green-400 transition">Approve UTR</button>` : '';
-                return `
-                <div class="glass-panel p-6 rounded-3xl mb-4 ${o.status === 'Pending' ? 'border-l-2 border-yellow-500' : 'border-l-2 border-green-500'}">
+            ordersDiv.innerHTML = state.orders.map(o => `
+                <div class="glass-panel p-6 rounded-3xl mb-4 border-l-2 border-green-500">
                     <div class="flex justify-between items-start mb-4">
-                        <div><span class="font-medium text-xs track-mega block mb-2">${o.id}</span>${badge}</div>
+                        <div>
+                            <span class="font-medium text-xs track-mega block mb-2">${o.id}</span>
+                            <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full border border-green-500/50 text-[9px] uppercase track-mega font-bold"><i class="fa-solid fa-check"></i> Paid via Razorpay</span>
+                        </div>
                         <span class="text-[9px] text-gray-500 uppercase track-mega">${o.time}</span>
                     </div>
                     <h4 class="font-light text-sm mb-1">${o.customer} <span class="text-gray-500 text-xs ml-2">(${o.phone})</span></h4>
-                    <p class="text-xs text-yellow-500 font-mono tracking-widest mb-4">UTR: ${o.utr}</p>
+                    <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-4">Pay ID: ${o.paymentId}</p>
                     <div class="space-y-2 border-t border-white/10 pt-4 bg-black/30 -mx-6 -mb-6 p-6 rounded-b-3xl">
                         ${o.items.map(i => `<div class="flex justify-between text-[10px] uppercase track-mega text-gray-400"><span>${i.name} x${i.qty}</span><span class="text-white">${inr(i.price*i.qty)}</span></div>`).join('')}
-                        <div class="flex justify-between items-center text-xs track-mega text-white font-bold pt-2 border-t border-white/5 mt-2"><span>TOTAL ${inr(o.total)}</span> ${btn}</div>
+                        <div class="flex justify-between items-center text-xs track-mega text-white font-bold pt-2 border-t border-white/5 mt-2"><span>TOTAL ${inr(o.total)}</span> </div>
                     </div>
-                </div>`;
-            }).join('');
-        }
-
-        // ADMIN APPROVE ORDER
-        function approveOrder(id) {
-            let order = state.orders.find(o => o.id === id);
-            if(order) {
-                // Deduct stock only when approved
-                order.items.forEach(c => { const p = state.products.find(x => x.id === c.id); if(p) p.stock -= c.qty; });
-                order.status = 'Verified';
-                renderAdmin(); showToast('Order Verified & Stock Deducted', 'success');
-            }
+                </div>`).join('');
         }
 
         // ADMIN MODALS
@@ -569,15 +512,15 @@
                     document.getElementById('p-id').value = p.id; document.getElementById('p-name').value = p.name; document.getElementById('p-cat').value = p.cat; document.getElementById('p-price').value = p.price; document.getElementById('p-stock').value = p.stock; document.getElementById('p-img-data').value = p.img; document.getElementById('p-preview').src = p.img; document.getElementById('p-preview').classList.remove('hidden'); document.getElementById('p-icon').classList.add('hidden'); document.getElementById('p-text').innerText = 'Change Image';
                 } else { document.getElementById('p-id').value = ''; document.getElementById('p-name').value = ''; document.getElementById('p-price').value = ''; document.getElementById('p-stock').value = ''; }
             } else if (id === 'modal-ad') { resetUpload('ad'); document.getElementById('ad-title').value = ''; document.getElementById('ad-subtitle').value = ''; }
-            else if (id === 'modal-settings') { document.getElementById('set-merchant').value = state.settings.merchantName; document.getElementById('set-upi').value = state.settings.upiId; }
+            else if (id === 'modal-settings') { document.getElementById('set-merchant').value = state.settings.merchantName; document.getElementById('set-rzp').value = state.settings.rzpKey; }
         }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 
-        function saveProduct(e) { e.preventDefault(); const id = document.getElementById('p-id').value; const data = { id: id || 'P' + Date.now(), name: document.getElementById('p-name').value, cat: document.getElementById('p-cat').value, img: document.getElementById('p-img-data').value || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', price: Number(document.getElementById('p-price').value), stock: Number(document.getElementById('p-stock').value) }; if(id) state.products = state.products.map(x => x.id === id ? data : x); else state.products.unshift(data); closeModal('modal-product'); renderAdmin(); renderHome(); showToast('Inventory Updated'); }
-        function deleteProduct(id) { if(confirm('Delete product?')) { state.products = state.products.filter(x => x.id !== id); renderAdmin(); } }
-        function saveAd(e) { e.preventDefault(); state.ads.unshift({ id: 'A' + Date.now(), title: document.getElementById('ad-title').value, subtitle: document.getElementById('ad-subtitle').value, img: document.getElementById('ad-img-data').value }); closeModal('modal-ad'); renderAdmin(); initAds(); showToast('Banner Added'); }
-        function deleteAd(id) { state.ads = state.ads.filter(x => x.id !== id); renderAdmin(); initAds(); showToast('Banner Removed'); }
-        function saveSettings(e) { e.preventDefault(); state.settings.merchantName = document.getElementById('set-merchant').value; state.settings.upiId = document.getElementById('set-upi').value; closeModal('modal-settings'); showToast('Bank Link Secured', 'success'); }
+        function saveProduct(e) { e.preventDefault(); const id = document.getElementById('p-id').value; const data = { id: id || 'P' + Date.now(), name: document.getElementById('p-name').value, cat: document.getElementById('p-cat').value, img: document.getElementById('p-img-data').value || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', price: Number(document.getElementById('p-price').value), stock: Number(document.getElementById('p-stock').value) }; if(id) state.products = state.products.map(x => x.id === id ? data : x); else state.products.unshift(data); closeModal('modal-product'); renderAdmin(); renderHome(); showToast('Inventory Updated', 'success'); }
+        function deleteProduct(id) { if(confirm('Delete product?')) { state.products = state.products.filter(x => x.id !== id); renderAdmin(); showToast('Deleted', 'success');} }
+        function saveAd(e) { e.preventDefault(); state.ads.unshift({ id: 'A' + Date.now(), title: document.getElementById('ad-title').value, subtitle: document.getElementById('ad-subtitle').value, img: document.getElementById('ad-img-data').value }); closeModal('modal-ad'); renderAdmin(); initAds(); showToast('Banner Added', 'success'); }
+        function deleteAd(id) { state.ads = state.ads.filter(x => x.id !== id); renderAdmin(); initAds(); showToast('Banner Removed', 'success'); }
+        function saveSettings(e) { e.preventDefault(); state.settings.merchantName = document.getElementById('set-merchant').value; state.settings.rzpKey = document.getElementById('set-rzp').value; closeModal('modal-settings'); showToast('Razorpay Linked', 'success'); }
 
         window.onload = () => { renderCategories(); renderHome(); initAds(); updateNavbar(); };
     </script>
