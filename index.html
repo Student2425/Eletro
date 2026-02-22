@@ -6,523 +6,283 @@
     <title>ELECTRO | The Aesthetic Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap" rel="stylesheet">
-    
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600&display=swap" rel="stylesheet">
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { 
-                        surface: '#050505', 
-                        glass: 'rgba(20, 20, 20, 0.6)',
-                        borderGlass: 'rgba(255, 255, 255, 0.08)',
-                        accent: '#ffffff'
-                    }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { surface: '#030303', glass: 'rgba(20, 20, 20, 0.6)', borderGlass: 'rgba(255, 255, 255, 0.08)', accent: '#ffffff' } } } }
     </script>
     <style>
-        body { background-color: #000; color: #f5f5f7; overflow-x: hidden; scroll-behavior: smooth; }
-        .glass-panel { background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--borderGlass); box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
-        .nav-blur { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-bottom: 1px solid var(--borderGlass); }
-        .track-mega { letter-spacing: 0.25em; } .font-hairline { font-weight: 100; }
+        body { background-color: #000; color: #f5f5f7; overflow-x: hidden; scroll-behavior: smooth; font-family: 'Inter', sans-serif; }
+        .glass-panel { background: var(--glass); backdrop-filter: blur(24px); border: 1px solid var(--borderGlass); box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        .nav-blur { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(30px); border-bottom: 1px solid var(--borderGlass); }
+        .track-mega { letter-spacing: 0.25em; }
         input, select, textarea { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px 0; outline: none; transition: border-color 0.3s ease; }
-        input:focus, select:focus, textarea:focus { border-bottom-color: white; }
-        .btn-sleek { transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); } .btn-sleek:hover { transform: scale(1.02); box-shadow: 0 10px 30px rgba(255,255,255,0.15); }
-        .btn-outline { border: 1px solid var(--borderGlass); transition: all 0.3s; } .btn-outline:hover { background: white; color: black; border-color: white; }
-        input[type="file"] { display: none; } .custom-file-upload { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px dashed var(--borderGlass); padding: 30px; cursor: pointer; border-radius: 16px; transition: all 0.3s; background: rgba(255,255,255,0.01); }
-        .custom-file-upload:hover { border-color: #fff; background: rgba(255,255,255,0.03); }
-        .ad-slide { transition: opacity 1s ease-in-out; opacity: 0; position: absolute; inset: 0; z-index: 0; } .ad-slide.active { opacity: 1; z-index: 10; }
-        .ad-content { transform: translateY(20px); opacity: 0; transition: all 0.8s ease-out 0.3s; } .ad-slide.active .ad-content { transform: translateY(0); opacity: 1; }
-        #cart-drawer { transform: translateX(100%); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); } #cart-drawer.open { transform: translateX(0); }
-        #overlay { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; } #overlay.open { opacity: 1; pointer-events: auto; }
-        .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(30px); }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-        ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #444; }
+        input:focus { border-bottom-color: white; }
+        .drawer { transform: translateX(100%); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .drawer.open { transform: translateX(0); }
+        #overlay { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; background: rgba(0,0,0,0.85); z-index: 100; }
+        #overlay.open { opacity: 1; pointer-events: auto; }
+        .card-container { perspective: 1000px; width: 100%; max-width: 320px; height: 180px; margin: 0 auto 2rem; }
+        .card-inner { width: 100%; height: 100%; transition: transform 0.8s; transform-style: preserve-3d; position: relative; }
+        .card-container.flip .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.01)); }
+        .card-back { transform: rotateY(180deg); }
+        .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke: #4ade80; fill: none; animation: stroke 0.6s forwards; }
+        @keyframes stroke { 100% { stroke-dashoffset: 0; } }
     </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <div id="overlay" class="fixed inset-0 bg-black/90 z-[100]" onclick="closeCart()"></div>
-    <div id="toast-container" class="fixed top-24 left-1/2 -translate-x-1/2 z-[400] flex flex-col gap-3 w-max"></div>
-
-    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full md:w-[450px] bg-[#050505] border-l border-white/5 z-[150] flex flex-col">
-        <div class="p-8 border-b border-white/10 flex justify-between items-center">
-            <h2 class="text-[10px] uppercase track-mega text-gray-400">Shopping Bag</h2>
-            <button onclick="closeCart()" class="text-white text-xl hover:rotate-90 transition-transform"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div id="cart-items" class="flex-grow overflow-y-auto p-8 space-y-8"></div>
-        <div class="p-8 border-t border-white/10 bg-black">
-            <div id="checkout-details" class="hidden mb-8 space-y-4">
-                <h3 class="text-[10px] uppercase track-mega text-gray-400 mb-4">Logistics Detail</h3>
-                <input type="text" id="cust-name" placeholder="Recipient Name" required class="w-full text-sm">
-                <input type="text" id="cust-address" placeholder="Delivery Address" required class="w-full text-sm">
-                <input type="tel" id="cust-phone" placeholder="Contact Number" required class="w-full text-sm">
-            </div>
-            <div class="flex justify-between items-end mb-6">
-                <span class="text-[10px] uppercase track-mega text-gray-500">Subtotal</span>
-                <span id="cart-total" class="text-2xl font-light">₹0</span>
-            </div>
-            <button id="checkout-init-btn" onclick="openCheckoutDetails()" class="w-full bg-white text-black py-4 rounded-full text-[10px] uppercase track-mega font-bold btn-sleek">Proceed to Checkout</button>
-        </div>
-    </div>
-
-    <div id="modal-settings" class="fixed inset-0 z-[250] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass-panel p-10 w-full max-w-md rounded-[2rem] relative">
-            <button onclick="closeModal('modal-settings')" class="absolute top-6 right-6 text-gray-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="text-[10px] uppercase track-mega text-accent font-bold mb-8 text-center border-b border-white/10 pb-4"><i class="fa-solid fa-building-columns mr-2"></i> Gateway Setup</h2>
-            <form onsubmit="saveSettings(event)" class="space-y-6">
-                <div>
-                    <label class="text-[9px] uppercase track-mega text-gray-500 block mb-2">Store Name (Shown on Payment page)</label>
-                    <input type="text" id="set-merchant" required class="w-full text-sm font-semibold text-white">
-                </div>
-                <div>
-                    <label class="text-[9px] uppercase track-mega text-gray-500 block mb-2">Razorpay Key ID</label>
-                    <input type="text" id="set-rzp" required class="w-full text-sm font-mono text-green-400 tracking-wider" placeholder="rzp_test_...">
-                </div>
-                <div class="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <p class="text-[9px] text-gray-400 uppercase track-mega leading-relaxed"><i class="fa-solid fa-circle-info text-blue-400 mr-1"></i> Razorpay will handle all Cards, UPI, and Verification securely.</p>
-                </div>
-                <button type="submit" class="w-full border border-white text-white py-4 rounded-full text-[10px] uppercase track-mega font-bold mt-2 hover:bg-white hover:text-black transition">Save Configuration</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modal-product" class="fixed inset-0 z-[250] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass-panel p-10 w-full max-w-lg rounded-3xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('modal-product')" class="absolute top-6 right-6 text-gray-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            <form onsubmit="saveProduct(event)" class="space-y-6">
-                <input type="hidden" id="p-id"> <input type="hidden" id="p-img-data">
-                <label class="custom-file-upload">
-                    <input type="file" id="p-upload" accept="image/*" onchange="handleImageUpload(event, 'p-img-data', 'p-preview', 'p-icon', 'p-text')">
-                    <img id="p-preview" class="hidden w-32 h-32 object-cover rounded-xl mb-4 border border-white/10 shadow-lg">
-                    <i id="p-icon" class="fa-solid fa-camera text-3xl text-gray-500 mb-3"></i>
-                    <span id="p-text" class="text-[10px] uppercase track-mega text-gray-400 text-center">Select Image from Device</span>
-                </label>
-                <input type="text" id="p-name" placeholder="Product Name" required class="text-sm w-full">
-                <div class="flex gap-6"><select id="p-cat" class="w-full text-sm text-gray-300" required></select><input type="number" id="p-price" placeholder="Price (₹)" required class="text-sm w-full"></div>
-                <input type="number" id="p-stock" placeholder="Available Stock" required class="text-sm w-full">
-                <button type="submit" class="w-full bg-white text-black py-4 rounded-full text-[10px] uppercase track-mega font-bold mt-4 hover:bg-gray-200 transition">Save Details</button>
-            </form>
-        </div>
-    </div>
-    <div id="modal-ad" class="fixed inset-0 z-[250] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass-panel p-10 w-full max-w-lg rounded-3xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('modal-ad')" class="absolute top-6 right-6 text-gray-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            <form onsubmit="saveAd(event)" class="space-y-6">
-                <input type="hidden" id="ad-id"> <input type="hidden" id="ad-img-data">
-                <label class="custom-file-upload">
-                    <input type="file" id="ad-upload" accept="image/*" onchange="handleImageUpload(event, 'ad-img-data', 'ad-preview', 'ad-icon', 'ad-text')">
-                    <img id="ad-preview" class="hidden w-full h-32 object-cover rounded-xl mb-4 border border-white/10 shadow-lg">
-                    <i id="ad-icon" class="fa-solid fa-image text-3xl text-gray-500 mb-3"></i>
-                    <span id="ad-text" class="text-[10px] uppercase track-mega text-gray-400 text-center">Upload Background</span>
-                </label>
-                <input type="text" id="ad-title" placeholder="Main Heading" required class="text-sm w-full">
-                <input type="text" id="ad-subtitle" placeholder="Sub Heading" required class="text-sm w-full">
-                <button type="submit" class="w-full bg-white text-black py-4 rounded-full text-[10px] uppercase track-mega font-bold mt-4 hover:bg-gray-200 transition">Publish Banner</button>
-            </form>
-        </div>
-    </div>
+    <div id="overlay" class="fixed inset-0" onclick="closeAllDrawers()"></div>
+    <div id="toast-container" class="fixed top-24 left-1/2 -translate-x-1/2 z-[500] flex flex-col gap-3"></div>
 
     <nav class="nav-blur fixed top-0 w-full z-50">
-        <div class="w-full max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center h-[80px]">
-            <div class="text-xl font-hairline track-mega cursor-pointer" onclick="navigate('home')">ELECTR<span class="font-bold">O</span></div>
-            <div class="flex items-center gap-8">
-                <div class="hidden md:flex gap-8 text-[10px] uppercase track-mega font-medium text-gray-400">
-                    <button onclick="navigate('home')" class="hover:text-white transition">Gallery</button>
-                </div>
-                <div id="auth-section" class="text-[10px] uppercase track-mega flex items-center gap-6 text-gray-400 font-bold border-l border-white/10 pl-8"></div>
-                <button onclick="openCart()" class="relative hover:text-white transition flex items-center gap-2">
+        <div class="max-w-[1400px] mx-auto px-6 flex justify-between items-center h-20">
+            <div class="text-xl font-light track-mega cursor-pointer" onclick="navigate('home')">ELECTR<span class="font-bold">O</span></div>
+            <div class="flex items-center gap-6">
+                <div id="auth-section" class="text-[10px] uppercase track-mega font-bold text-gray-400"></div>
+                <button onclick="openProfile()" id="prof-btn" class="hidden text-gray-400 hover:text-white"><i class="fa-regular fa-user text-lg"></i></button>
+                <button onclick="openCart()" class="relative text-gray-400 hover:text-white">
                     <i class="fa-solid fa-bag-shopping text-lg"></i>
-                    <span id="nav-cart-count" class="absolute -top-2 -right-2 bg-white text-black text-[9px] h-4 w-4 rounded-full flex items-center justify-center font-bold shadow-[0_0_10px_rgba(255,255,255,0.3)]">0</span>
+                    <span id="cart-badge" class="absolute -top-2 -right-2 bg-white text-black text-[9px] h-4 w-4 rounded-full flex items-center justify-center font-bold">0</span>
                 </button>
             </div>
         </div>
     </nav>
 
-    <main class="min-h-screen flex flex-col pt-[80px]">
-        <section id="view-home" class="view-section flex-grow">
-            <div id="ad-slider-container" class="relative w-full h-[75vh] flex items-center justify-center overflow-hidden bg-[#020202]">
-                <div class="absolute w-[600px] h-[600px] bg-white/5 blur-[120px] rounded-full pointer-events-none z-0"></div>
-                <div id="ad-slides" class="w-full h-full relative z-10"></div>
-                <div class="absolute bottom-8 left-0 right-0 flex justify-center gap-3 z-20" id="ad-indicators"></div>
+    <main class="pt-20 min-h-screen">
+        <section id="view-home" class="view-section px-6 md:px-12 py-10">
+            <div class="mb-16 text-center">
+                <h1 class="text-5xl md:text-7xl font-hairline tracking-tighter mb-4">PURE VISION.</h1>
+                <p class="text-[10px] uppercase track-mega text-gray-500">The Aesthetic of Future Tech</p>
             </div>
-
-            <div id="store" class="w-full max-w-[1400px] mx-auto px-6 md:px-12 py-20">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-16 gap-8 border-b border-white/10 pb-8">
-                    <h2 class="text-xl font-light track-mega uppercase">The Gallery</h2>
-                    <div class="flex flex-wrap justify-center gap-4" id="category-tabs"></div>
-                </div>
-                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16"></div>
-            </div>
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
         </section>
 
-        <section id="view-login" class="view-section hidden flex-grow flex items-center justify-center px-4 bg-[#050505]">
-            <div class="glass-panel p-12 w-full max-w-md rounded-[2.5rem] text-center fade-in-up">
-                <i class="fa-solid fa-fingerprint text-3xl mb-6 text-white"></i>
-                <h2 class="text-2xl font-light tracking-tight mb-2">Member Login</h2>
-                <p class="text-[10px] uppercase track-mega text-gray-500 mb-10">Verify your credentials</p>
-                <form onsubmit="handleAuth(event)" class="space-y-8 text-left">
-                    <input type="text" id="username" required placeholder="Username" class="w-full text-sm">
-                    <input type="password" id="password" required placeholder="Password" class="w-full text-sm">
-                    <button id="login-btn" class="w-full border border-white text-white py-4 rounded-full text-[10px] uppercase track-mega font-bold hover:bg-white hover:text-black transition mt-6">Authenticate</button>
+        <section id="view-login" class="view-section hidden flex items-center justify-center min-h-[80vh]">
+            <div class="glass-panel p-12 w-full max-w-md rounded-[2rem] text-center">
+                <h2 class="text-xl font-light track-mega uppercase mb-8">Login</h2>
+                <form onsubmit="handleAuth(event)" class="space-y-6 text-left">
+                    <input type="text" id="login-u" placeholder="Username" required class="w-full">
+                    <input type="password" id="login-p" placeholder="Password" required class="w-full">
+                    <button class="w-full bg-white text-black py-4 rounded-full font-bold uppercase text-[10px] track-mega mt-4">Authenticate</button>
                 </form>
             </div>
         </section>
 
-        <section id="view-admin" class="view-section hidden flex-grow w-full max-w-[1400px] mx-auto px-6 md:px-12 py-16">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-white/10 pb-8 gap-6 fade-in-up">
-                <div>
-                    <span class="text-[10px] text-gray-500 uppercase track-mega block mb-2">Workspace</span>
-                    <h2 class="text-4xl font-hairline tracking-tight uppercase">Command Center</h2>
-                </div>
-                <div class="flex flex-wrap gap-4">
-                    <button onclick="openModal('modal-settings')" class="bg-[#111] border border-white/20 px-6 py-3 rounded-full text-[10px] font-bold uppercase track-mega hover:border-white transition"><i class="fa-solid fa-gear"></i> Razorpay Config</button>
-                    <button onclick="openModal('modal-ad')" class="bg-[#111] border border-white/20 px-6 py-3 rounded-full text-[10px] font-bold uppercase track-mega hover:border-white transition">Banners</button>
-                    <button onclick="openModal('modal-product')" class="bg-white text-black px-6 py-3 rounded-full text-[10px] font-bold uppercase track-mega hover:bg-gray-200 transition">Add Product</button>
-                </div>
+        <section id="view-admin" class="view-section hidden px-6 md:px-12 py-10">
+            <div class="flex justify-between items-center border-b border-white/10 pb-6 mb-10">
+                <h2 class="text-3xl font-light tracking-tight">COMMAND CENTER</h2>
+                <button onclick="logout()" class="text-red-500 text-[10px] uppercase track-mega">Logout</button>
             </div>
-
-            <div class="grid grid-cols-1 xl:grid-cols-12 gap-12">
-                <div class="xl:col-span-4 flex flex-col gap-10 fade-in-up" style="animation-delay: 0.1s;">
-                    <div>
-                        <h3 class="text-[10px] font-bold uppercase track-mega text-gray-400 mb-6">Manage Categories</h3>
-                        <div class="glass-panel p-6 rounded-3xl">
-                            <form onsubmit="addCategory(event)" class="flex gap-4 mb-6">
-                                <input type="text" id="new-cat-input" placeholder="New Category" required class="flex-grow text-sm">
-                                <button type="submit" class="bg-white text-black px-4 rounded-full text-[10px] font-bold uppercase track-mega">+</button>
-                            </form>
-                            <div id="admin-cat-list" class="flex flex-wrap gap-2"></div>
-                        </div>
-                    </div>
-                     <div>
-                        <h3 class="text-[10px] font-bold uppercase track-mega text-gray-400 mb-6">Active Banners</h3>
-                        <div class="glass-panel rounded-3xl overflow-hidden">
-                            <div id="admin-ads-list" class="flex flex-col divide-y divide-white/5"></div>
-                        </div>
-                    </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div>
+                    <h3 class="text-xs uppercase track-mega mb-6 text-gray-500">Live Orders</h3>
+                    <div id="admin-orders" class="space-y-4"></div>
                 </div>
-
-                <div class="xl:col-span-8 flex flex-col gap-10 fade-in-up" style="animation-delay: 0.2s;">
-                    <div>
-                        <h3 class="text-[10px] font-bold uppercase track-mega text-gray-400 mb-6 flex items-center gap-3">
-                            <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span> Paid & Verified Transactions
-                        </h3>
-                        <div id="admin-orders" class="space-y-4"></div>
-                        <div id="no-orders" class="glass-panel p-10 text-center rounded-3xl text-gray-600 text-[10px] uppercase track-mega">Waiting for live Razorpay verified payments...</div>
-                    </div>
-
-                    <div>
-                        <h3 class="text-[10px] font-bold uppercase track-mega text-gray-400 mb-6">Inventory Management</h3>
-                        <div class="glass-panel rounded-3xl overflow-hidden w-full">
-                            <div id="admin-inventory" class="flex flex-col divide-y divide-white/5"></div>
-                        </div>
-                    </div>
+                <div>
+                    <h3 class="text-xs uppercase track-mega mb-6 text-gray-500">Inventory</h3>
+                    <div id="admin-inventory" class="glass-panel rounded-2xl divide-y divide-white/5"></div>
                 </div>
             </div>
         </section>
-
     </main>
 
-    <footer class="border-t border-white/10 bg-[#020202]">
-        <div class="max-w-[1400px] mx-auto px-6 md:px-12 py-16 flex flex-col md:flex-row justify-between items-center gap-8">
-            <div class="text-xl font-hairline track-mega text-gray-500">ELECTR<span class="font-bold text-white">O</span></div>
-            <div class="flex gap-8 text-[10px] uppercase track-mega text-gray-600">
-                <span class="flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Secured by Razorpay</span>
-            </div>
-            <p class="text-[9px] uppercase track-mega text-gray-600">&copy; 2026 Electro Inc. The Aesthetic Standard.</p>
+    <div id="cart-drawer" class="drawer fixed top-0 right-0 h-full w-full md:w-[400px] bg-[#050505] z-[150] flex flex-col p-8 border-l border-white/5 shadow-2xl">
+        <div class="flex justify-between items-center mb-10">
+            <span class="text-[10px] uppercase track-mega text-gray-500">Your Bag</span>
+            <button onclick="closeAllDrawers()"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
-    </footer>
+        <div id="cart-items" class="flex-grow space-y-6 overflow-y-auto"></div>
+        <div class="mt-auto pt-6 border-t border-white/10">
+            <div id="checkout-form" class="hidden space-y-4 mb-6">
+                <input type="text" id="c-name" placeholder="Full Name" class="w-full text-sm">
+                <input type="text" id="c-addr" placeholder="Address" class="w-full text-sm">
+                <input type="tel" id="c-phone" placeholder="Phone" maxlength="10" class="w-full text-sm">
+            </div>
+            <div class="flex justify-between items-end mb-6">
+                <span class="text-[10px] uppercase text-gray-500">Total</span>
+                <span id="cart-total" class="text-2xl font-light">₹0</span>
+            </div>
+            <button id="checkout-btn" onclick="openPayment()" class="w-full bg-white text-black py-4 rounded-full font-bold text-[10px] uppercase track-mega">Proceed</button>
+        </div>
+    </div>
+
+    <div id="profile-drawer" class="drawer fixed top-0 right-0 h-full w-full md:w-[400px] bg-[#050505] z-[150] p-8 border-l border-white/5">
+        <div class="flex justify-between items-center mb-10">
+            <span class="text-[10px] uppercase track-mega text-gray-500">Profile</span>
+            <button onclick="closeAllDrawers()"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <form onsubmit="saveProfile(event)" class="space-y-6">
+            <input type="text" id="p-name" placeholder="Name" required class="w-full text-sm">
+            <input type="tel" id="p-phone" placeholder="Phone" maxlength="10" required class="w-full text-sm">
+            <textarea id="p-addr" placeholder="Address" class="w-full text-sm py-2"></textarea>
+            <button class="w-full bg-white text-black py-4 rounded-full font-bold text-[10px] uppercase track-mega">Save Identity</button>
+        </form>
+    </div>
+
+    <div id="modal-pay" class="fixed inset-0 z-[400] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-xl">
+        <div class="glass-panel p-8 md:p-12 w-full max-w-md rounded-[2.5rem] relative text-center">
+            <button onclick="closeModal('modal-pay')" class="absolute top-6 right-6 text-gray-500"><i class="fa-solid fa-xmark"></i></button>
+            <div id="pay-content">
+                <h2 class="text-2xl font-light mb-8 uppercase tracking-widest">Verify Payment</h2>
+                
+                <div class="card-container" id="card-obj">
+                    <div class="card-inner">
+                        <div class="card-front flex flex-col justify-between text-left">
+                            <i class="fa-solid fa-microchip text-2xl text-gray-400"></i>
+                            <div id="v-num" class="font-mono tracking-widest">XXXX XXXX XXXX XXXX</div>
+                            <div id="v-name" class="text-[10px] uppercase">USER NAME</div>
+                        </div>
+                        <div class="card-back flex items-center justify-center">
+                            <div class="bg-white text-black px-4 py-1 rounded font-mono" id="v-cvv">***</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-8">
+                    <input type="text" id="in-num" placeholder="Card Number" maxlength="16" oninput="updateCard()" class="w-full text-center tracking-widest">
+                    <div class="flex gap-4">
+                        <input type="text" id="in-exp" placeholder="MM/YY" maxlength="5" class="w-full text-center">
+                        <input type="password" id="in-cvv" placeholder="CVV" maxlength="3" onfocus="flip(true)" onblur="flip(false)" oninput="updateCard()" class="w-full text-center">
+                    </div>
+                </div>
+                <button onclick="finalizeOrder()" class="w-full bg-white text-black py-4 rounded-full font-bold uppercase text-[10px] track-mega">Confirm ₹<span id="pay-total">0</span></button>
+            </div>
+
+            <div id="pay-success" class="hidden py-10">
+                <svg class="w-16 h-16 mx-auto mb-6" viewBox="0 0 52 52"><circle class="checkmark-circle" cx="26" cy="26" r="25"/><path class="text-green-400" stroke-width="3" fill="none" d="M14 27l7 7 16-16" stroke="#4ade80"/></svg>
+                <h3 class="text-2xl font-light mb-4">Verified</h3>
+                <button onclick="window.location.reload()" class="border border-white/20 px-8 py-2 rounded-full text-[10px] uppercase">Finish</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        const inr = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
-        
-        // APP STATE
-        let state = {
-            user: null, cart: [], orders: [], currentFilter: 'All',
-            settings: { rzpKey: '', merchantName: 'Electro Premium Store' }, 
-            categories: ['Audio', 'Vision', 'Lifestyle'],
-            ads: [{ id: 'ad1', title: 'PURE <span class="font-semibold">VISION.</span>', subtitle: 'The aesthetic of future tech', img: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=2000' }],
+        const state = {
+            user: JSON.parse(localStorage.getItem('user')) || null,
+            cart: [],
+            orders: JSON.parse(localStorage.getItem('orders')) || [],
             products: [
-                { id: '1', name: 'Aura Studio Master', cat: 'Audio', price: 45000, img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800', stock: 10 },
-                { id: '2', name: 'Pro Display XDR', cat: 'Vision', price: 189000, img: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800', stock: 4 }
+                { id: 1, name: 'Aura Master X', price: 45000, img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800' },
+                { id: 2, name: 'Zenith Display', price: 89000, img: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800' }
             ]
         };
 
-        function showToast(msg, type = 'info') {
-            const c = document.getElementById('toast-container'); const t = document.createElement('div');
-            let color = type === 'error' ? 'text-red-400 border-red-500' : 'text-white border-white';
-            t.className = `glass-panel px-6 py-4 rounded-full fade-in-up text-[10px] uppercase track-mega font-bold ${color} shadow-2xl border-l-2`;
-            t.innerText = msg; c.appendChild(t);
-            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(10px)'; setTimeout(() => t.remove(), 400); }, 3000);
-        }
-
-        // IMAGE UPLOAD
-        function handleImageUpload(e, dataId, previewId, iconId, textId) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    document.getElementById(dataId).value = evt.target.result;
-                    document.getElementById(previewId).src = evt.target.result; document.getElementById(previewId).classList.remove('hidden');
-                    document.getElementById(iconId).classList.add('hidden'); document.getElementById(textId).innerText = 'Change Image';
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-        function resetUpload(type) {
-            let pfx = type === 'product' ? 'p' : 'ad';
-            document.getElementById(`${pfx}-preview`).classList.add('hidden'); document.getElementById(`${pfx}-preview`).src = '';
-            document.getElementById(`${pfx}-img-data`).value = '';
-            document.getElementById(`${pfx}-icon`).classList.remove('hidden'); 
-            document.getElementById(`${pfx}-text`).innerText = type === 'product' ? 'Select Image' : 'Upload Background';
-        }
-
-        // AD SLIDER
-        let currentAd = 0; let adInterval;
-        function initAds() {
-            const container = document.getElementById('ad-slides'); const indicators = document.getElementById('ad-indicators');
-            if(state.ads.length === 0) { container.innerHTML = ''; indicators.innerHTML = ''; return; }
-            container.innerHTML = state.ads.map((ad, idx) => `
-                <div class="ad-slide w-full h-full flex flex-col items-center justify-center ${idx === 0 ? 'active' : ''}" id="slide-${idx}">
-                    ${ad.img ? `<img src="${ad.img}" class="absolute inset-0 w-full h-full object-cover opacity-30 grayscale">` : ''}
-                    <div class="ad-content relative z-10 text-center px-4 w-full">
-                        <h1 class="text-5xl md:text-8xl font-hairline tracking-tighter mb-6">${ad.title}</h1>
-                        <p class="text-gray-400 text-xs md:text-sm track-mega uppercase mb-10">${ad.subtitle}</p>
-                        <button onclick="document.getElementById('store').scrollIntoView()" class="btn-outline px-10 py-4 rounded-full text-[10px] uppercase track-mega font-bold backdrop-blur-md bg-black/20">Explore Gallery</button>
-                    </div>
-                </div>
-            `).join('');
-            indicators.innerHTML = state.ads.map((_, idx) => `<button onclick="goToAd(${idx})" class="w-8 h-1 rounded-full ${idx === 0 ? 'bg-white' : 'bg-white/20'} transition-all"></button>`).join('');
-            clearInterval(adInterval); if(state.ads.length > 1) { adInterval = setInterval(() => { goToAd((currentAd + 1) % state.ads.length); }, 5000); }
-        }
-        function goToAd(idx) {
-            if(state.ads.length <= 1) return;
-            document.querySelectorAll('.ad-slide').forEach(s => s.classList.remove('active')); document.getElementById(`slide-${idx}`).classList.add('active');
-            const btns = document.getElementById('ad-indicators').children;
-            for(let i=0; i<btns.length; i++) { btns[i].className = `w-8 h-1 rounded-full transition-all ${i === idx ? 'bg-white' : 'bg-white/20'}`; }
-            currentAd = idx;
-        }
-
-        // ROUTING
-        function navigate(view) {
-            if (view === 'admin' && state.user?.role !== 'admin') return;
-            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden')); document.getElementById(`view-${view}`).classList.remove('hidden');
-            if (view === 'home') { renderCategories(); renderHome(); initAds(); }
-            if (view === 'admin') { renderAdminCategories(); renderAdmin(); }
+        // NAVIGATION
+        function navigate(v) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`view-${v}`).classList.remove('hidden');
+            if(v==='home') renderHome();
+            if(v==='admin') renderAdmin();
             window.scrollTo(0,0);
         }
+
         function updateNavbar() {
             const auth = document.getElementById('auth-section');
-            if (!state.user) { auth.innerHTML = `<button onclick="navigate('login')" class="hover:text-white transition border-b border-transparent hover:border-white pb-1">Sign In</button>`; } 
-            else {
-                let adminBtn = state.user.role === 'admin' ? `<button onclick="navigate('admin')" class="text-white border-b border-white pb-1">Console</button>` : '';
-                auth.innerHTML = `${adminBtn} <span class="hidden md:inline">${state.user.name}</span> <button onclick="logout()" class="hover:text-red-500 transition"><i class="fa-solid fa-power-off"></i></button>`;
+            const profBtn = document.getElementById('prof-btn');
+            if(!state.user) {
+                auth.innerHTML = `<button onclick="navigate('login')">Sign In</button>`;
+                profBtn.style.display = 'none';
+            } else {
+                auth.innerHTML = state.user.role === 'admin' ? 'Console' : state.user.name || state.user.username;
+                profBtn.style.display = state.user.role === 'admin' ? 'none' : 'block';
             }
         }
+
         function handleAuth(e) {
-            e.preventDefault(); const u = document.getElementById('username').value; const p = document.getElementById('password').value;
-            if (u === 'admin' && p === '20190126550') { state.user = { name: 'Admin', role: 'admin' }; navigate('admin'); } 
-            else { state.user = { name: u, role: 'user' }; navigate('home'); }
-            updateNavbar(); showToast('Session Verified'); e.target.reset();
+            e.preventDefault();
+            const u = document.getElementById('login-u').value;
+            const p = document.getElementById('login-p').value;
+            if(u === 'admin' && p === '20190126550') state.user = { name: 'Admin', role: 'admin' };
+            else state.user = { name: u, role: 'user' };
+            localStorage.setItem('user', JSON.stringify(state.user));
+            updateNavbar();
+            navigate(state.user.role === 'admin' ? 'admin' : 'home');
         }
-        function logout() { state.user = null; navigate('home'); updateNavbar(); showToast('Logged Out'); }
+
+        function logout() { localStorage.removeItem('user'); window.location.reload(); }
 
         // STORE
-        function renderCategories() {
-            const tabs = document.getElementById('category-tabs');
-            let html = `<button onclick="filterCat('All')" class="pb-1 text-[10px] uppercase track-mega font-bold border-b-2 ${state.currentFilter === 'All' ? 'border-white text-white' : 'border-transparent text-gray-500 hover:text-white'} transition">All</button>`;
-            state.categories.forEach(c => { html += `<button onclick="filterCat('${c}')" class="pb-1 text-[10px] uppercase track-mega font-bold border-b-2 ${state.currentFilter === c ? 'border-white text-white' : 'border-transparent text-gray-500 hover:text-white'} transition">${c}</button>`; });
-            tabs.innerHTML = html;
-        }
-        function filterCat(cat) { state.currentFilter = cat; renderCategories(); renderHome(); }
-
         function renderHome() {
             const grid = document.getElementById('product-grid');
-            const displayProducts = state.currentFilter === 'All' ? state.products : state.products.filter(p => p.cat === state.currentFilter);
-            grid.innerHTML = displayProducts.map((p, i) => `
-                <div class="group fade-in-up flex flex-col" style="animation-delay: ${i*0.1}s">
-                    <div class="aspect-[4/5] mb-6 overflow-hidden bg-white/5 relative cursor-pointer rounded-[2rem]" onclick="addToCart('${p.id}')">
-                        ${p.stock <= 0 ? `<div class="absolute inset-0 z-10 flex items-center justify-center bg-black/50 backdrop-blur-sm"><span class="text-white border border-white px-4 py-2 text-[10px] uppercase track-mega">Sold Out</span></div>` : ''}
-                        <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ${p.stock <=0 ? 'grayscale' : ''}">
-                        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition duration-500 z-20">
-                            <span class="bg-white text-black px-6 py-3 rounded-full text-[10px] uppercase track-mega font-bold shadow-2xl block whitespace-nowrap">Add to Bag</span>
-                        </div>
-                    </div>
-                    <p class="text-[9px] text-gray-500 uppercase track-mega mb-2">${p.cat}</p>
-                    <h3 class="font-light text-lg mb-2">${p.name}</h3>
-                    <p class="text-sm font-semibold">${inr(p.price)}</p>
+            grid.innerHTML = state.products.map(p => `
+                <div class="glass-panel p-6 rounded-[2rem] text-center flex flex-col items-center">
+                    <img src="${p.img}" class="w-full h-48 object-cover rounded-xl mb-6">
+                    <h3 class="font-light mb-2 uppercase text-sm">${p.name}</h3>
+                    <p class="text-accent font-bold mb-6">₹${p.price.toLocaleString()}</p>
+                    <button onclick="addToCart(${p.id})" class="w-full py-3 bg-white text-black rounded-full font-bold text-[9px] uppercase tracking-widest">Add to Bag</button>
                 </div>
             `).join('');
-            if(displayProducts.length === 0) grid.innerHTML = `<div class="col-span-full text-center text-gray-500 text-[10px] track-mega uppercase py-20">No items available.</div>`;
-        }
-
-        // CART 
-        function openCart() { document.getElementById('cart-drawer').classList.add('open'); document.getElementById('overlay').classList.add('open'); renderCart(); }
-        function closeCart() { 
-            document.getElementById('cart-drawer').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); 
-            document.getElementById('checkout-details').classList.add('hidden');
-            document.getElementById('checkout-init-btn').innerText = 'Proceed to Checkout'; document.getElementById('checkout-init-btn').onclick = openCheckoutDetails;
         }
 
         function addToCart(id) {
-            if (!state.user) { showToast('Please sign in first', 'error'); navigate('login'); return; }
-            const p = state.products.find(x => x.id === id); if (p.stock <= 0) return;
-            const exists = state.cart.find(x => x.id === id);
-            if (exists) { if(exists.qty < p.stock) exists.qty++; else return showToast('Limit reached', 'error'); } else state.cart.push({...p, qty: 1});
-            updateCartCount(); openCart();
+            const p = state.products.find(x => x.id === id);
+            state.cart.push(p);
+            updateCart();
+            openCart();
         }
-        function updateCartCount() { document.getElementById('nav-cart-count').innerText = state.cart.reduce((a,b) => a + b.qty, 0); }
 
-        function renderCart() {
+        function updateCart() {
+            document.getElementById('cart-badge').innerText = state.cart.length;
             const container = document.getElementById('cart-items');
-            if(state.cart.length === 0) {
-                container.innerHTML = `<div class="h-full flex flex-col justify-center items-center text-gray-500 text-[10px] uppercase track-mega">Bag is empty</div>`;
-                document.getElementById('checkout-init-btn').style.display = 'none';
-            } else {
-                document.getElementById('checkout-init-btn').style.display = 'block';
-                container.innerHTML = state.cart.map(i => `
-                    <div class="flex items-center gap-6 pb-6 border-b border-white/5">
-                        <img src="${i.img}" class="w-20 h-20 object-cover bg-white/5 rounded-xl shrink-0">
-                        <div class="flex-grow">
-                            <h4 class="font-medium text-sm">${i.name}</h4>
-                            <p class="text-xs text-gray-500 mt-1">Qty: ${i.qty} | ${inr(i.price)}</p>
-                            <button onclick="removeFromCart('${i.id}')" class="text-[9px] uppercase track-mega text-red-500 mt-3 hover:text-red-400 border-b border-red-500 pb-1">Remove</button>
-                        </div>
+            container.innerHTML = state.cart.map((i, idx) => `
+                <div class="flex items-center gap-4">
+                    <img src="${i.img}" class="w-16 h-16 object-cover rounded-lg">
+                    <div class="flex-grow">
+                        <p class="text-xs uppercase">${i.name}</p>
+                        <button onclick="remove(${idx})" class="text-[9px] text-red-500 uppercase">Remove</button>
                     </div>
-                `).join('');
-            }
-            document.getElementById('cart-total').innerText = inr(state.cart.reduce((a,b) => a + (b.price * b.qty), 0));
+                    <p class="text-sm">₹${i.price.toLocaleString()}</p>
+                </div>
+            `).join('');
+            const total = state.cart.reduce((a,b) => a + b.price, 0);
+            document.getElementById('cart-total').innerText = '₹' + total.toLocaleString();
+            document.getElementById('pay-total').innerText = total.toLocaleString();
         }
-        function removeFromCart(id) { state.cart = state.cart.filter(x => x.id !== id); renderCart(); updateCartCount(); }
 
-        // RAZORPAY INTEGRATION LOGIC
+        function remove(idx) { state.cart.splice(idx,1); updateCart(); }
+
+        // CHECKOUT
         function openCheckoutDetails() {
-            const form = document.getElementById('checkout-details');
-            if(form.classList.contains('hidden')) { 
-                form.classList.remove('hidden'); 
-                document.getElementById('checkout-init-btn').innerText = 'Pay securely with Razorpay'; 
-                document.getElementById('checkout-init-btn').onclick = initiateRazorpayPayment; 
-            }
-        }
-
-        function initiateRazorpayPayment() {
-            const name = document.getElementById('cust-name').value.trim(); 
-            const addr = document.getElementById('cust-address').value.trim(); 
-            const phone = document.getElementById('cust-phone').value.trim();
-            if(!name || !addr || !phone) return showToast('Please fill complete logistics details', 'error');
-
-            if(!state.settings.rzpKey || state.settings.rzpKey.trim() === '') {
-                return showToast('Admin must configure Razorpay Key in Settings first', 'error');
-            }
-
-            const totalPaise = state.cart.reduce((a,b) => a + (b.price * b.qty), 0) * 100; // Razorpay uses paise
-
-            var options = {
-                "key": state.settings.rzpKey, 
-                "amount": totalPaise, 
-                "currency": "INR",
-                "name": state.settings.merchantName,
-                "description": "Premium Order Checkout",
-                "theme": { "color": "#000000" },
-                "prefill": {
-                    "name": name,
-                    "contact": phone
-                },
-                "handler": function (response) {
-                    // Success Callback from Razorpay
-                    processVerifiedOrder(response.razorpay_payment_id, name, phone);
-                }
+            if(!state.user) return navigate('login');
+            document.getElementById('checkout-form').classList.remove('hidden');
+            document.getElementById('checkout-btn').onclick = () => {
+                const n = document.getElementById('c-name').value;
+                const a = document.getElementById('c-addr').value;
+                if(n.length < 3 || a.length < 5) return alert('Enter correct details');
+                document.getElementById('modal-pay').classList.remove('hidden');
+                document.getElementById('modal-pay').classList.add('flex');
             };
-            var rzp1 = new Razorpay(options);
-            rzp1.on('payment.failed', function (response){
-                showToast('Payment Failed: ' + response.error.description, 'error');
-            });
-            rzp1.open();
         }
 
-        function processVerifiedOrder(paymentId, name, phone) {
-            closeCart();
-            // Deduct stock safely
-            state.cart.forEach(c => { const p = state.products.find(x => x.id === c.id); if(p) p.stock -= c.qty; });
-            
-            // Add Verified Order
-            state.orders.unshift({
-                id: 'ORD-' + Math.floor(100000 + Math.random()*900000),
-                customer: name, 
-                phone: phone,
-                paymentId: paymentId, // Store Razorpay ID
-                items: [...state.cart], 
-                total: state.cart.reduce((a,b) => a + (b.price * b.qty), 0),
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            });
-            
-            state.cart = []; updateCartCount(); 
-            document.getElementById('cust-name').value = ''; document.getElementById('cust-address').value = ''; document.getElementById('cust-phone').value='';
-            
-            showToast('Order Paid & Verified Successfully', 'success');
-            renderHome();
-            if(state.user && state.user.role === 'admin') renderAdmin();
+        function finalizeOrder() {
+            if(document.getElementById('in-num').value.length !== 16) return alert('Invalid Card');
+            document.getElementById('pay-content').classList.add('hidden');
+            document.getElementById('pay-success').classList.remove('hidden');
+            const order = { id: Date.now(), user: document.getElementById('c-name').value, total: state.cart.reduce((a,b)=>a+b.price,0) };
+            state.orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(state.orders));
         }
 
-        // ADMIN FUNCTIONS
-        function renderAdminCategories() {
-            const list = document.getElementById('admin-cat-list');
-            list.innerHTML = state.categories.map(c => `<span class="border border-white/20 px-4 py-2 rounded-full text-[10px] track-mega uppercase flex items-center gap-3 bg-white/5">${c} <button onclick="deleteCategory('${c}')" class="text-red-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button></span>`).join('');
-            document.getElementById('p-cat').innerHTML = state.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+        // UI HELPERS
+        function updateCard() {
+            document.getElementById('v-num').innerText = document.getElementById('in-num').value || 'XXXX XXXX XXXX XXXX';
+            document.getElementById('v-cvv').innerText = document.getElementById('in-cvv').value || '***';
         }
-        function addCategory(e) { e.preventDefault(); const val = document.getElementById('new-cat-input').value.trim(); if(val && !state.categories.includes(val)) { state.categories.push(val); renderAdminCategories(); document.getElementById('new-cat-input').value = ''; showToast('Category Added', 'success'); } }
-        function deleteCategory(cat) { if(confirm(`Delete ${cat}?`)) { state.categories = state.categories.filter(c => c !== cat); renderAdminCategories(); showToast('Removed', 'success'); } }
+        function flip(b) { document.getElementById('card-obj').classList.toggle('flip', b); }
+        function openCart() { document.getElementById('cart-drawer').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
+        function openProfile() { document.getElementById('profile-drawer').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
+        function closeAllDrawers() { document.querySelectorAll('.drawer').forEach(d=>d.classList.remove('open')); document.getElementById('overlay').classList.remove('open'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function saveProfile(e) { e.preventDefault(); state.user.name = document.getElementById('p-name').value; state.user.phone = document.getElementById('p-phone').value; localStorage.setItem('user', JSON.stringify(state.user)); closeAllDrawers(); updateNavbar(); }
+        function fillFromProfile() { document.getElementById('c-name').value = state.user.name; document.getElementById('c-phone').value = state.user.phone; }
 
         function renderAdmin() {
-            document.getElementById('admin-ads-list').innerHTML = state.ads.map(ad => `<div class="flex items-center justify-between p-4 hover:bg-white/[0.02] transition"><div class="flex items-center gap-4">${ad.img ? `<img src="${ad.img}" class="w-16 h-8 object-cover rounded">` : `<div class="w-16 h-8 bg-white/10 rounded"></div>`}<span class="text-xs tracking-wider">${ad.title.replace(/(<([^>]+)>)/ig, '')}</span></div><button onclick="deleteAd('${ad.id}')" class="text-[9px] uppercase track-mega text-red-500 hover:text-white transition">Remove</button></div>`).join('');
-            document.getElementById('admin-inventory').innerHTML = state.products.map(p => `<div class="flex flex-col md:flex-row items-start md:items-center justify-between p-6 hover:bg-white/[0.02] transition gap-4"><div class="flex items-center gap-6 w-full md:w-auto"><img src="${p.img}" class="w-14 h-14 object-cover rounded-lg bg-white/5 border border-white/10 shrink-0"><div><span class="font-light text-sm">${p.name}</span><span class="text-[9px] text-gray-500 uppercase track-mega block mt-1">${p.cat}</span></div></div><div class="hidden md:flex items-center gap-10"><div class="text-[10px] track-mega uppercase text-center w-16 ${p.stock < 5 ? 'text-red-500' : 'text-gray-400'}">QTY ${p.stock}</div><div class="text-sm font-light w-24 text-right">${inr(p.price)}</div></div><div class="flex gap-6 w-full md:w-auto justify-end pt-4 md:pt-0 border-t border-white/5 md:border-none"><button onclick="openModal('modal-product', '${p.id}')" class="text-[9px] uppercase track-mega text-gray-400 hover:text-white transition">Edit</button><button onclick="deleteProduct('${p.id}')" class="text-[9px] uppercase track-mega text-gray-600 hover:text-red-500 transition">Remove</button></div></div>`).join('');
-            
-            const ordersDiv = document.getElementById('admin-orders');
-            document.getElementById('no-orders').classList.toggle('hidden', state.orders.length > 0);
-            ordersDiv.innerHTML = state.orders.map(o => `
-                <div class="glass-panel p-6 rounded-3xl mb-4 border-l-2 border-green-500">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <span class="font-medium text-xs track-mega block mb-2">${o.id}</span>
-                            <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full border border-green-500/50 text-[9px] uppercase track-mega font-bold"><i class="fa-solid fa-check"></i> Paid via Razorpay</span>
-                        </div>
-                        <span class="text-[9px] text-gray-500 uppercase track-mega">${o.time}</span>
-                    </div>
-                    <h4 class="font-light text-sm mb-1">${o.customer} <span class="text-gray-500 text-xs ml-2">(${o.phone})</span></h4>
-                    <p class="text-[10px] text-gray-400 font-mono tracking-widest mb-4">Pay ID: ${o.paymentId}</p>
-                    <div class="space-y-2 border-t border-white/10 pt-4 bg-black/30 -mx-6 -mb-6 p-6 rounded-b-3xl">
-                        ${o.items.map(i => `<div class="flex justify-between text-[10px] uppercase track-mega text-gray-400"><span>${i.name} x${i.qty}</span><span class="text-white">${inr(i.price*i.qty)}</span></div>`).join('')}
-                        <div class="flex justify-between items-center text-xs track-mega text-white font-bold pt-2 border-t border-white/5 mt-2"><span>TOTAL ${inr(o.total)}</span> </div>
-                    </div>
-                </div>`).join('');
+            document.getElementById('admin-inventory').innerHTML = state.products.map(p => `<div class="p-4 flex justify-between"><span>${p.name}</span><span>${inr(p.price)}</span></div>`).join('');
+            document.getElementById('admin-orders').innerHTML = state.orders.map(o => `<div class="glass-panel p-4 mb-2">Order #${o.id} - ${o.user} - ${inr(o.total)}</div>`).join('');
         }
 
-        // ADMIN MODALS
-        function openModal(id, dataId = null) { 
-            const modal = document.getElementById(id); modal.classList.remove('hidden'); modal.classList.add('flex'); 
-            if (id === 'modal-product') {
-                resetUpload('product');
-                if (dataId) {
-                    const p = state.products.find(x => x.id === dataId);
-                    document.getElementById('p-id').value = p.id; document.getElementById('p-name').value = p.name; document.getElementById('p-cat').value = p.cat; document.getElementById('p-price').value = p.price; document.getElementById('p-stock').value = p.stock; document.getElementById('p-img-data').value = p.img; document.getElementById('p-preview').src = p.img; document.getElementById('p-preview').classList.remove('hidden'); document.getElementById('p-icon').classList.add('hidden'); document.getElementById('p-text').innerText = 'Change Image';
-                } else { document.getElementById('p-id').value = ''; document.getElementById('p-name').value = ''; document.getElementById('p-price').value = ''; document.getElementById('p-stock').value = ''; }
-            } else if (id === 'modal-ad') { resetUpload('ad'); document.getElementById('ad-title').value = ''; document.getElementById('ad-subtitle').value = ''; }
-            else if (id === 'modal-settings') { document.getElementById('set-merchant').value = state.settings.merchantName; document.getElementById('set-rzp').value = state.settings.rzpKey; }
-        }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
-
-        function saveProduct(e) { e.preventDefault(); const id = document.getElementById('p-id').value; const data = { id: id || 'P' + Date.now(), name: document.getElementById('p-name').value, cat: document.getElementById('p-cat').value, img: document.getElementById('p-img-data').value || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', price: Number(document.getElementById('p-price').value), stock: Number(document.getElementById('p-stock').value) }; if(id) state.products = state.products.map(x => x.id === id ? data : x); else state.products.unshift(data); closeModal('modal-product'); renderAdmin(); renderHome(); showToast('Inventory Updated', 'success'); }
-        function deleteProduct(id) { if(confirm('Delete product?')) { state.products = state.products.filter(x => x.id !== id); renderAdmin(); showToast('Deleted', 'success');} }
-        function saveAd(e) { e.preventDefault(); state.ads.unshift({ id: 'A' + Date.now(), title: document.getElementById('ad-title').value, subtitle: document.getElementById('ad-subtitle').value, img: document.getElementById('ad-img-data').value }); closeModal('modal-ad'); renderAdmin(); initAds(); showToast('Banner Added', 'success'); }
-        function deleteAd(id) { state.ads = state.ads.filter(x => x.id !== id); renderAdmin(); initAds(); showToast('Banner Removed', 'success'); }
-        function saveSettings(e) { e.preventDefault(); state.settings.merchantName = document.getElementById('set-merchant').value; state.settings.rzpKey = document.getElementById('set-rzp').value; closeModal('modal-settings'); showToast('Razorpay Linked', 'success'); }
-
-        window.onload = () => { renderCategories(); renderHome(); initAds(); updateNavbar(); };
+        window.onload = () => { renderHome(); updateNavbar(); };
     </script>
 </body>
 </html>
